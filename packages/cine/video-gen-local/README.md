@@ -22,9 +22,13 @@ from ComfyUI's `Video → MiniMax H3` template), not in code.
 | `pollIntervalMs` | `2000` | Status poll interval |
 | `timeoutMs` | `1800000` | Hard timeout per generation |
 
-Supported template tokens: `__PROMPT__`, `__NEGATIVE_PROMPT__`,
-`__REFERENCE_IMAGE__`, `__WIDTH__`, `__HEIGHT__`, `__STEPS__`,
-`__DURATION__`, `__SEED__`.
+Supported template tokens: `__PROMPT__`, `__WIDTH__`, `__HEIGHT__`,
+`__STEPS__`, `__LENGTH__`, `__SEED__`, `__OUTPUT_PREFIX__`.
+
+`__LENGTH__` is the H3 latent frame count, derived from the request duration by
+`alignFrameCount()` — snapped onto H3's `17k+5` frame grid at 24 fps (5 s → 124).
+A ready-to-use text-to-video template ships in `workflows/h3-t2v-template.json`
+(validated against ComfyUI 0.30.1 + the pruned-INT8 DiT on a 16 GB GPU).
 
 ## Known Limitations and Deferred Work
 

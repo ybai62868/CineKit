@@ -35,9 +35,8 @@ export interface Config {
   outputDir?: string
   /**
    * The ComfyUI API-format workflow template. String tokens in node values are
-   * replaced before submission: `__PROMPT__`, `__NEGATIVE_PROMPT__`,
-   * `__REFERENCE_IMAGE__`, `__WIDTH__`, `__HEIGHT__`, `__STEPS__`,
-   * `__DURATION__`, `__SEED__`.
+   * replaced before submission: `__PROMPT__`, `__WIDTH__`, `__HEIGHT__`,
+   * `__STEPS__`, `__LENGTH__`, `__SEED__`, `__OUTPUT_PREFIX__`.
    */
   workflowTemplate: unknown
   /** Default output width in pixels (overridden by the request). */
@@ -48,6 +47,8 @@ export interface Config {
   steps?: number
   /** Default clip duration in seconds (overridden by the request). */
   durationSeconds?: number
+  /** SaveVideo filename prefix (the subfolder/file basename). */
+  outputPrefix?: string
   /** Poll interval for status, in milliseconds. */
   pollIntervalMs?: number
   /** Hard timeout for one generation, in milliseconds. */
@@ -62,6 +63,7 @@ export const Config: z<Config> = z.object({
   height: z.number().default(480),
   steps: z.number().default(8),
   durationSeconds: z.number().default(5),
+  outputPrefix: z.string().default('cinekit/video'),
   pollIntervalMs: z.number().default(2000),
   timeoutMs: z.number().default(30 * 60 * 1000),
 })
@@ -78,6 +80,19 @@ interface ComfyUiHistoryEntry {
     images?: Array<{ filename: string; subfolder?: string; type?: string }>
     gifs?: Array<{ filename: string; subfolder?: string; type?: string }>
   }>
+}
+
+/** H3 runs at 24 fps; its latent frame count snaps to the 17k+5 grid. */
+const H3_FPS = 24
+const H3_GRID_STEP = 17
+const H3_GRID_REMAINDER = 5
+
+/** Snap a clip duration (seconds) onto H3's 17k+5 frame grid, ≥ 5 frames. */
+function alignFrameCount(durationSeconds: number): number {
+  let frames = Math.round(durationSeconds * H3_FPS)
+  if (frames < H3_GRID_REMAINDER) frames = H3_GRID_REMAINDER
+  while (frames % H3_GRID_STEP !== H3_GRID_REMAINDER) frames += 1
+  return frames
 }
 
 /** Video filename suffixes the backend recognizes as finished artifacts. */
@@ -184,15 +199,15 @@ export class LocalVideoGenerator extends VideoGenerator {
   /** Fill the workflow template with the request fields and parse it back. */
   private buildWorkflow(request: VideoGenRequest): Record<string, unknown> {
     const seed = request.seed ?? Math.floor(Math.random() * 0xffffffff)
+    const length = alignFrameCount(request.durationSeconds ?? this.config.durationSeconds)
     const filled = JSON.stringify(this.config.workflowTemplate)
       .replaceAll('__PROMPT__', request.prompt)
-      .replaceAll('__NEGATIVE_PROMPT__', request.negativePrompt ?? '')
-      .replaceAll('__REFERENCE_IMAGE__', request.referenceImage ?? '')
       .replaceAll('__WIDTH__', String(request.width ?? this.config.width))
       .replaceAll('__HEIGHT__', String(request.height ?? this.config.height))
       .replaceAll('__STEPS__', String(request.steps ?? this.config.steps))
-      .replaceAll('__DURATION__', String(request.durationSeconds ?? this.config.durationSeconds))
+      .replaceAll('__LENGTH__', String(length))
       .replaceAll('__SEED__', String(seed))
+      .replaceAll('__OUTPUT_PREFIX__', this.config.outputPrefix)
     return JSON.parse(filled) as Record<string, unknown>
   }
 
