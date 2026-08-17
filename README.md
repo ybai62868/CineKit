@@ -1,4 +1,4 @@
-# CineHarness
+# CineKit
 
 A **local-first, composable AI filmmaking framework** for game cinematics and short-form video.
 Inspired by the capability-seam architecture of [deepseek-harness](https://github.com/deepseek-ai/deepseek-harness)
@@ -6,7 +6,7 @@ and the node-graph workflow paradigm of [ComfyUI](https://github.com/comfyanonym
 
 ## What it is
 
-CineHarness is a plugin-based agent harness tuned for AI video production. It pairs a
+CineKit is a plugin-based agent harness tuned for AI video production. It pairs a
 cloud reasoning brain with a **local** video-generation engine, and wraps the whole
 pipeline — script → storyboard → shot → render → edit — in composable, replaceable
 capabilities.
@@ -15,15 +15,15 @@ capabilities.
 ┌─────────────────────────────────────────────────────────────┐
 │  Brain   DeepSeek API (deepseek-chat / deepseek-reasoner)    │  ← cloud, reasoning + tool-calling
 │  Engine  MiniMax H3 (local, via ComfyUI)                     │  ← local, video generation
-│  Skeleton CineHarness (capability seams + agent loop)        │  ← this repo
+│  Skeleton CineKit (capability seams + agent loop)        │  ← this repo
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Why CineHarness
+## Why CineKit
 
 AI comic-drama and short-video tools are everywhere, but they share the same pain:
 creators juggle five or six tools (script → image → video → voice → edit) and are locked
-into each platform's closed pipeline. CineHarness inverts this:
+into each platform's closed pipeline. CineKit inverts this:
 
 - **Open, composable workflows** — ComfyUI-style node graphs that humans edit visually
   and agents execute automatically (the LibTV "workflow = skill" pattern), with results
