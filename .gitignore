@@ -1,26 +1,45 @@
-# Dependencies
-node_modules/
-.pnpm-store/
-
-# Build output
-dist/
-lib/
-build/
-*.tsbuildinfo
-
-# Python
-__pycache__/
-*.pyc
-.venv/
-venv/
-*.egg-info/
-
-# Environment / secrets
+CLAUDE.local.md
 .env
-.env.*
-!.env.example
+node_modules/
+lib/
+*.tsbuildinfo
+pnpm-debug.log
+.pnpm-store/
+.cache/
+examples/*/*.jsonl
+.storages/
+.sessions/
+examples/*/.sessions/
+coverage/
+.doc-typecheck-*/
+.node-next-types-*/
+.oxlint-contract-*/
+.oxlintrc.contract-*.json
+oxlint-contract-*.ts
+.humanize/
+tmp/
+.claude/commands/
+.claude/launch.json
+.claude/settings.json
+.vscode/
+.DS_Store
+.idea
+mise.toml
+dist-exe/
+python/sdk-runtime/src/deepseek_harness_runtime/runtime/dsh-jsonrpc-agent-*
+python/sdk-runtime/src/deepseek_harness_runtime/runtime/node/
+python/**/__pycache__/
+python/**/.pytest_cache/
+apps/web/dist/
+.artifacts/
+.playwright-mcp/
+.orig
+.worktrees/
+worktrees/
+.agents/worktrees/
+.typert-*/
 
-# Model weights and large binaries
+# CineKit additions: model weights, generated media, local runtimes
 *.safetensors
 *.gguf
 *.ckpt
@@ -29,20 +48,13 @@ venv/
 *.bin
 models/
 checkpoints/
-
-# ComfyUI (mounted separately, not vendored here)
 ComfyUI/
 comfyui/
-
-# Generated media
 outputs/
 *.mp4
 *.mov
 *.webm
-
-# OS / editor
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
-*.log
+.venv/
+venv/
+__pycache__/
+*.pyc

@@ -1,8 +1,9 @@
 # CineKit
 
 A **local-first, composable AI filmmaking framework** for game cinematics and short-form video.
-Inspired by the capability-seam architecture of [deepseek-harness](https://github.com/deepseek-ai/deepseek-harness)
-and the node-graph workflow paradigm of [ComfyUI](https://github.com/comfyanonymous/ComfyUI).
+CineKit is a fork of [deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) (MIT),
+retuned for AI video production, combined with the node-graph workflow paradigm of
+[ComfyUI](https://github.com/comfyanonymous/ComfyUI).
 
 ## What it is
 
@@ -18,6 +19,17 @@ capabilities.
 │  Skeleton CineKit (capability seams + agent loop)        │  ← this repo
 └─────────────────────────────────────────────────────────────┘
 ```
+
+## Relationship to deepseek-harness
+
+CineKit is a full fork of deepseek-harness: the entire `@deepseek-ai/dsh-*` package
+tree (capability seams, session log, tool pipeline, sandbox, agent loop) ships here
+unchanged, so every upstream capability is available out of the box. CineKit adds its
+own packages under `packages/cine/` (video generation, character consistency, ComfyUI
+execution, project timeline) and keeps the upstream scope (`@deepseek-ai/dsh-*`) for
+now; rescoping to `@cinekit/*` is deferred until the M0 loop works.
+
+Upstream fork point: `deepseek-ai/deepseek-harness@47f943859b`.
 
 ## Why CineKit
 
