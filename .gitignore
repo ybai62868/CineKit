@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+lib/
+build/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Model weights and large binaries
+*.safetensors
+*.gguf
+*.ckpt
+*.pt
+*.pth
+*.bin
+models/
+checkpoints/
+
+# ComfyUI (mounted separately, not vendored here)
+ComfyUI/
+comfyui/
+
+# Generated media
+outputs/
+*.mp4
+*.mov
+*.webm
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
