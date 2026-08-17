@@ -97,13 +97,13 @@ system RAM leaves headroom for the full-INT8 model.
 | OS | Windows 11 |
 | Inference stack | ComfyUI v0.30.0+ · PyTorch cu130 · SageAttention |
 
-Estimated generation on this build (extrapolated from the 4060 Ti baseline in the
-handbook above):
+Measured generation on this build (real runs through the CineKit `video_generate`
+tool, 8 steps, cfg=1.0, euler/simple flow-matching):
 
-| Resolution | Duration | Est. time |
+| Resolution | Duration | Measured time |
 |---|---|---|
-| 480p · 5s | 832×480 | ~1.5–2 min/shot |
-| 768p · 5s | 1344×768 | ~8–12 min/shot |
+| 480p · 5s | 832×480 | ~66 s first shot (includes model load); later shots reuse the loaded weights |
+| 768p · 5s | 1344×768 | not yet measured |
 
 ## Status
 
