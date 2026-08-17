@@ -14,6 +14,7 @@
  * @module @deepseek-ai/dsh-video-gen-local
  */
 
+import { readFileSync } from 'node:fs'
 import { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
 import {
@@ -33,6 +34,12 @@ export interface Config {
   comfyuiUrl?: string
   /** Local directory where ComfyUI writes outputs (for resolving result paths). */
   outputDir?: string
+  /**
+   * Path to a JSON file holding the ComfyUI API-format workflow template.
+   * Mutually exclusive with {@link workflowTemplate}; the path form keeps the
+   * node graph out of the composition tree.
+   */
+  workflowTemplatePath?: string
   /**
    * The ComfyUI API-format workflow template. String tokens in node values are
    * replaced before submission: `__PROMPT__`, `__WIDTH__`, `__HEIGHT__`,
@@ -58,6 +65,7 @@ export interface Config {
 export const Config: z<Config> = z.object({
   comfyuiUrl: z.string().default('http://127.0.0.1:8188'),
   outputDir: z.string().default('output'),
+  workflowTemplatePath: z.string(),
   workflowTemplate: z.any(),
   width: z.number().default(832),
   height: z.number().default(480),
@@ -117,6 +125,42 @@ function engineUnavailable(cause: unknown): VideoGenError {
 }
 
 /**
+ * Resolve the workflow template at load time: exactly one of
+ * `workflowTemplatePath` or the inline `workflowTemplate` must be configured;
+ * anything else fails plugin loading. The path form reads and parses the JSON
+ * file once, keeping the node graph out of the composition tree.
+ * @param config - the raw plugin config before defaults were materialized.
+ * @returns the parsed API-format workflow template.
+ */
+function resolveTemplate(config: Config): Record<string, unknown> {
+  if (config.workflowTemplatePath !== undefined) {
+    if (config.workflowTemplate !== undefined) {
+      throw new VideoGenError(
+        'configure exactly one of workflowTemplatePath or workflowTemplate',
+        'VIDEO_REQUEST_INVALID',
+      )
+    }
+    try {
+      const raw = readFileSync(config.workflowTemplatePath, 'utf8')
+      return JSON.parse(raw) as Record<string, unknown>
+    } catch (error) {
+      throw new VideoGenError(
+        `cannot read workflow template: ${error instanceof Error ? error.message : String(error)}`,
+        'VIDEO_REQUEST_INVALID',
+        { cause: error },
+      )
+    }
+  }
+  if (config.workflowTemplate === undefined) {
+    throw new VideoGenError(
+      'configure exactly one of workflowTemplatePath or workflowTemplate',
+      'VIDEO_REQUEST_INVALID',
+    )
+  }
+  return config.workflowTemplate as Record<string, unknown>
+}
+
+/**
  * The local ComfyUI backend. Submits filled workflow templates, polls history,
  * and maps the ComfyUI lifecycle onto the {@link VideoJobStatus} union.
  */
@@ -126,9 +170,13 @@ export class LocalVideoGenerator extends VideoGenerator {
   /** Validated config (schemastery applied the defaults before construction). */
   readonly config: ResolvedConfig
 
+  /** The resolved workflow template, read from disk or carried inline. */
+  private readonly template: Record<string, unknown>
+
   constructor(ctx: Context, config: Config) {
     super(ctx)
     this.config = config as ResolvedConfig
+    this.template = resolveTemplate(config)
   }
 
   override async generate(request: VideoGenRequest, signal?: AbortSignal): Promise<VideoGenJobId> {
@@ -200,7 +248,7 @@ export class LocalVideoGenerator extends VideoGenerator {
   private buildWorkflow(request: VideoGenRequest): Record<string, unknown> {
     const seed = request.seed ?? Math.floor(Math.random() * 0xffffffff)
     const length = alignFrameCount(request.durationSeconds ?? this.config.durationSeconds)
-    const filled = JSON.stringify(this.config.workflowTemplate)
+    const filled = JSON.stringify(this.template)
       .replaceAll('__PROMPT__', request.prompt)
       .replaceAll('__WIDTH__', String(request.width ?? this.config.width))
       .replaceAll('__HEIGHT__', String(request.height ?? this.config.height))

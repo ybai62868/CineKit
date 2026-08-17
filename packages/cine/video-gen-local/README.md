@@ -15,12 +15,16 @@ from ComfyUI's `Video → MiniMax H3` template), not in code.
 |---|---|---|
 | `comfyuiUrl` | `http://127.0.0.1:8188` | ComfyUI server base URL |
 | `outputDir` | `output` | Directory ComfyUI writes video artifacts to |
-| `workflowTemplate` | (required) | API-format workflow JSON with `__PLACEHOLDER__` tokens |
+| `workflowTemplatePath` | (none) | Path to a JSON file holding the API-format workflow; read once at load |
+| `workflowTemplate` | (none) | Inline API-format workflow JSON with `__PLACEHOLDER__` tokens |
 | `width` / `height` | `832` / `480` | Default output size |
 | `steps` | `8` | Default sampling steps |
 | `durationSeconds` | `5` | Default clip duration |
 | `pollIntervalMs` | `2000` | Status poll interval |
 | `timeoutMs` | `1800000` | Hard timeout per generation |
+
+`workflowTemplatePath` and `workflowTemplate` are mutually exclusive: configuring
+neither or both fails plugin loading.
 
 Supported template tokens: `__PROMPT__`, `__WIDTH__`, `__HEIGHT__`,
 `__STEPS__`, `__LENGTH__`, `__SEED__`, `__OUTPUT_PREFIX__`.
