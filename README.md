@@ -70,6 +70,29 @@ Local H3 inference is validated on a **16 GB VRAM GPU + ≥64 GB RAM** (see the
 Generation is minutes-per-shot, so the pipeline previews at 480p and re-renders only
 selected shots at 768p.
 
+### Reference build
+
+The author develops CineKit on the following machine — a known-good "recommended tier"
+for local H3. The 16 GB VRAM card runs the pruned-INT8 DiT comfortably, and the large
+system RAM leaves headroom for the full-INT8 model.
+
+| Component | Spec |
+|---|---|
+| CPU | AMD Ryzen 9 9950X (16-core) |
+| GPU | NVIDIA GeForce RTX 5080, 16 GB VRAM |
+| RAM | 93.6 GB |
+| Driver | NVIDIA 610.88 |
+| OS | Windows 11 |
+| Inference stack | ComfyUI v0.30.0+ · PyTorch cu130 · SageAttention |
+
+Estimated generation on this build (extrapolated from the 4060 Ti baseline in the
+handbook above):
+
+| Resolution | Duration | Est. time |
+|---|---|---|
+| 480p · 5s | 832×480 | ~1.5–2 min/shot |
+| 768p · 5s | 1344×768 | ~8–12 min/shot |
+
 ## Status
 
 Pre-release. No tagged release yet; architecture is free to change.
